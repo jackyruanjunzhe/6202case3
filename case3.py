@@ -7,7 +7,7 @@ from random import randint
 
 # Generate a random value between 0 to 1 to determine the annual demand forecast number
 myrandom = random.random()
-print(myrandom)
+
 if myrandom < 0.3:
     demand_year1 = 80000
     demand_year2 = 90000
@@ -957,6 +957,16 @@ def initialize_lockers(num_small, num_medium, num_large):
         'medium': [['free',0] for _ in range(num_medium)],
         'large': [['free',0] for _ in range(num_large)]
     }
+def lockers_afteroneday(lockers):
+## Initialize lockers with given numbers for each size. """
+#list [status,till time when]
+    for i in range(len(lockers['small'])):
+        lockers['small'][i][1] = lockers['small'][i][1] - 24
+    for n in range(len(lockers['medium'])):
+        lockers['medium'][n][1] = lockers['medium'][n][1] - 24
+    for p in range(len(lockers['large'])):
+        lockers['large'][p][1] = lockers['large'][p][1] - 24
+    return lockers
 
 def generate_parcel(deliverytime, pickuptime,size):
 ##      Generate random parcel sizes based on the given distribution.
@@ -985,6 +995,7 @@ def assign_parcels_to_lockers(parcel, lockers):
             lockers[parcel[2]][i] = ['occupied',parcel[1]]
             assignmentstatus = 'successful assignment'
             break
+
         elif lockerstate == 'occupied' and occupiedtime < parcel[0]:
             lockers[parcel[2]][i] = ['occupied',parcel[1]]
             assignmentstatus = 'successful assignment'
@@ -995,30 +1006,82 @@ def assign_parcels_to_lockers(parcel, lockers):
     return lockers,assignmentstatus,lockfreetime
 
 # Simulation parameters
-num_small_lockers = 10
-num_medium_lockers = 10
-num_large_lockers = 10
-num_parcels = 20
-size_distribution = [0.3, 0.36, 0.24]  # Probability distribution for small, medium, large parcels
+num_small_lockers = 20
+num_medium_lockers = 20
+num_large_lockers = 20
+num_lockers = num_small_lockers+num_medium_lockers+num_large_lockers
 
 # Initialize lockers
 lockers = initialize_lockers(num_small_lockers, num_medium_lockers, num_large_lockers)
 
 # Generate parcel sizes
 parcels = generate_parcel(1,7,8)
+parcelss = generate_parcel(8,12,8)
 
 # Assign parcels to lockers
-updated_lockers = assign_parcels_to_lockers(parcels, lockers)[0]
 
-print("\nUpdated locker status:")
-for size, locker_status in updated_lockers.items():
-    print(f"{size.capitalize()} lockers:", locker_status)
+#####Task3
+#####put data in task 1 into task2's simulator
+#####use num_successful_assignment_all to count for successful assignment
+list_yearly_performance = []
+list_yearly_utilization = []
+list_daily_performance = []
+list_daily_utilization = []
+for each_year_demand in list_fiveyear_day_demand:
 
+    num_successful_assignment_all = 0
+    locker_all_freetime = 0
+    newdemand = 0
+    for demand in each_year_demand:
+        num_successful_assignment_day = 0
+        locker_daily_freetime = 0
+        for i in range(newdemand,newdemand + demand):
+            parcels = generate_parcel(list_d[i],list_p[i],list_space[i])
+            updated_lockers,assignmentstatus,lockfreetime = assign_parcels_to_lockers(parcels, lockers)
 
+            locker_daily_freetime += lockfreetime
+            if assignmentstatus == "successful assignment":
+                num_successful_assignment_day += 1
 
+            # print("\nnew pacel:")
+            # print(parcels)
+            # print("\nUpdated locker status:")
+            # for size, locker_status in updated_lockers.items():
+            #     print(f"{size.capitalize()} lockers:", locker_status)
 
+        lockers = lockers_afteroneday(lockers)
+        list_daily_performance.append(num_successful_assignment_day/demand)
+        list_daily_utilization.append(locker_daily_freetime/(num_lockers*24))
+        num_successful_assignment_all += num_successful_assignment_day
+        locker_all_freetime += locker_daily_freetime
+        newdemand += demand
 
+    # print("\none new day!!")
+    ##each year's demand accept rate
+    demand_accept_rate = num_successful_assignment_all/newdemand
+    demand_reject_rate = 1 - demand_accept_rate
+    yearly_utilization = locker_all_freetime/(24*num_lockers*365)
+    list_yearly_performance.append(demand_accept_rate)
+    list_yearly_utilization.append(yearly_utilization)
+general_performance = sum(list_yearly_performance)/5
+general_utilization = sum(list_yearly_utilization)/5
 
+performanceframe = pd.DataFrame()
+performanceframe['dailyperformance'] = list_daily_performance
+performanceframe['dailyutilization'] = list_daily_utilization
+
+performanceframe.to_csv('systemperformancedaily.csv')
+
+performanceyearlyframe = pd.DataFrame()
+performanceyearlyframe['yearlyperformance'] = list_yearly_performance
+performanceyearlyframe['yearlyutilization'] = list_yearly_utilization
+
+performanceyearlyframe.to_csv('systemperformanceyearly.csv')
+
+print("general performance is:")
+print(general_performance)
+print("general_utilization is:")
+print(general_utilization)
 
 
 
