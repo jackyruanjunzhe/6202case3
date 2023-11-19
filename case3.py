@@ -1009,6 +1009,7 @@ def assign_parcels_to_lockers(parcel, lockers):
 num_small_lockers = 20
 num_medium_lockers = 20
 num_large_lockers = 20
+
 num_lockers = num_small_lockers+num_medium_lockers+num_large_lockers
 
 # Initialize lockers
@@ -1082,6 +1083,21 @@ print("general performance is:")
 print(general_performance)
 print("general_utilization is:")
 print(general_utilization)
+
+##Task4 design the locker_
+
+num_grid = 60
+num_grip_usedas_interactive = 7
+rate_3type = [0.35,0.36,0.29]
+real_rate_3type = [rate_3type[0]*3, rate_3type[1]*8, rate_3type[2]*18]
+total = sum(real_rate_3type)
+num_small = (num_grid- num_grip_usedas_interactive)*(real_rate_3type[0]/total)
+num_medium = (num_grid- num_grip_usedas_interactive)*(real_rate_3type[1]/total)
+num_large = (num_grid- num_grip_usedas_interactive)*(real_rate_3type[2]/total)
+
+print(num_small)
+print(num_medium)
+print(num_large)
 
 
 
