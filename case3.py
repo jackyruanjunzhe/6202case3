@@ -1095,9 +1095,9 @@ num_small = (num_grid- num_grip_usedas_interactive)*(real_rate_3type[0]/total)
 num_medium = (num_grid- num_grip_usedas_interactive)*(real_rate_3type[1]/total)
 num_large = (num_grid- num_grip_usedas_interactive)*(real_rate_3type[2]/total)
 
-print(num_small)
-print(num_medium)
-print(num_large)
+print(num_small/3)
+print(num_medium/8)
+print(num_large/18)
 
 
 
